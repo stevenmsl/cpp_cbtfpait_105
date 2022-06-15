@@ -14,19 +14,23 @@ using namespace sol105;
 using namespace std;
 
 /*takeaways
-  - preorder=[3,9,20,15,7] inorder=[9,3,15,20,7]
-  - so the basic idea is locate the root from the preorder
-    in the inorder and break both into smaller pieces
-  - for example from preorder, we know 3 is the root.
-  - you then look at inorder and know [9] is its left
-    child, which only has one number: (indx of 3) - 0 = 1
-  - we now go back to preorder and know that the next
-    number will be its left tree as well
-  - the rest should be all for the right child
-  - pre [3,9,20,15,7] -> [9] & [20,15,7]
-  - in [9,3,15,20,7] -> [9] & [15,20,7]
-  - so we can continue building left child with [9] and [9]
-    and right child with [20,15,7] and [15,20,7]
+  - example preorder=[3,9,20,15,7] inorder=[9,3,15,20,7]
+    - so the basic idea is locating the root in the
+      preorder array first and then go back to the
+      inorder array to find its left child
+    - for example from preorder, we know 3 is the root.
+    - you then look at inorder and know [9] is its left
+      child, which only has one number:
+      (indx of 3) - 0 = 1 - 0 = 1
+    - we now go back to preorder and know that the next
+      one number will be its left child as well
+    - the rest should be all for the right child
+    - pre [3,9,20,15,7] -> [9] & [20,15,7]
+    - in [9,3,15,20,7] -> [9] & [15,20,7]
+    - so we can continue building left child with [9] and [9]
+      and right child with [20,15,7] and [15,20,7]
+
+  - Time complexity: O(n)
 
 */
 
@@ -50,7 +54,10 @@ Node *Solution::_buildTree(int preS, int preE, int inS, int inE,
   /* map back to the inorder */
   auto rootIdx = map[preorder[preS]];
 
-  /* there is 'num' numbers before rootIdx */
+  /* there is 'num' numbers before rootIdx
+     - inorder[inS...rootIdx-1]
+     - rootIdx-1 - inS + 1 = rootIdx - ins
+  */
   auto num = rootIdx - inS;
 
   auto root = new Node(preorder[preS]);
@@ -58,12 +65,12 @@ Node *Solution::_buildTree(int preS, int preE, int inS, int inE,
  for left and right child */
 
   /* for the left child
-     - the preorder starts from the next position where the
-       root is in the preorder: preS + 1
-     - the next "num" numbers should be for the left child
-       so the preorder ends in pres + num
+     - in the preorder, the nodes in this range preorder[preS+1...preS+num]
+       is in the root's left child
      - the start of the inorder is unchanged. It ends at
        rootIdx-1, before the index of the root.
+     - you count num toward the right in preorder and num toward the left
+       in the inorder
   */
 
   root->left = _buildTree(preS + 1, preS + num, inS, rootIdx - 1, preorder, inorder, map);
